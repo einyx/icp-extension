@@ -29,5 +29,4 @@ if [ ! -x "$PY" ]; then
 fi
 [ -x "$PY" ] || PY="$(command -v python3)"
 
-echo "=== $(date -Is) pid=$$ argv=$* dbus=${DBUS_SESSION_BUS_ADDRESS:-unset} py=$PY" >> /tmp/icp-host.log
-exec "$PY" -m icp.vault.host 2>>/tmp/icp-host.log
+exec "$PY" -m icp.vault.host
