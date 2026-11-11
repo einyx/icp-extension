@@ -79,6 +79,54 @@ shows:
 host/install.sh <EXTENSION_ID>
 ```
 
+## Publish to addons.mozilla.org
+
+Yes - this extension can be published on AMO (the Firefox Marketplace). It is
+MIT licensed and its source is public, which is what AMO requires.
+
+1. Build the package:
+
+   ```bash
+   ./build-xpi.sh          # -> dist/apple-passwords-<version>.xpi
+   ```
+
+2. Sign it on AMO: <https://addons.mozilla.org/developers/> -> *Submit a New
+   Add-on* -> *On your own* (unlisted). Unlisted is the right first step: the
+   add-on gets signed and installable from its AMO URL without waiting for a
+   review. Listing it later only adds the store entry.
+
+   AMO asks for a source-code URL and a license - use this repository and the
+   MIT license in `LICENSE.md`.
+
+3. AMO gives the signed add-on its own gecko id. Register the native host with
+   that id, so the host only talks to the add-on you installed:
+
+   ```bash
+   host/install.sh "" "<AMO_ADDON_ID>"
+   ```
+
+   The add-on id is in its AMO URL: `something@your-domain`.
+
+4. Install it in Firefox from the AMO URL (`about:addons` -> gear ->
+   *Install Add-on From URL*). A signed add-on needs neither
+   `xpinstall.signatures.required` nor `extensions.autoDisableScopes`, and it
+   updates itself.
+
+## Security notes
+
+* The extension is read-only: it never writes to the keychain.
+* A credential's one-time-code secret never crosses the native-messaging
+  protocol - only a code generated at that moment does.
+* The native host answers a `match` request only for the domain of the page
+  that asked. Sub-domains match with a dotted boundary, so `notexample.com`
+  never matches `example.com`. Entries that carry only a saved name (no host)
+  match only when that name is the registrable label of the page, so
+  `cloudflare.attacker.net` cannot claim a "Cloudflare" entry.
+* The password itself is never put into the page's DOM - it is only written
+  into the form field when the user picks it.
+* Filling requires a real user gesture: a synthetic event dispatched by the
+  page is ignored.
+
 ## Requirements
 
 * `icp` installed and signed in (`icp login`), so that the local vault exists
