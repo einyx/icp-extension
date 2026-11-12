@@ -1,4 +1,4 @@
-# Apple Passwords - the browser extension for [Apple Passwords](https://github.com/einyx/apple-passwords)
+# iCloud Passwords - the browser extension for [Apple Passwords](https://github.com/einyx/apple-passwords)
 
 An iCloud Keychain autofill extension for Linux. It talks to the `icp` client
 through a native-messaging host and fills your logins into the page, the way the
@@ -134,25 +134,25 @@ license in `LICENSE.md`.
 
 #### The first upload, and the ones after it
 
-The first upload *creates* the add-on, and the id in the manifest
-(`icp-linux@local`) becomes its id on AMO. A second "Submit a New Add-on" with
+The first upload *creates* the add-on, and the id in the manifest becomes its id
+on AMO. The id in the repository's manifest (`icp-linux@local`) is the one a
+sideloaded copy has; the package for AMO is built with the id the add-on has
+there:
+
+```bash
+./build-xpi.sh --id "icloud-passwords@einyx.github.io"
+``` A second "Submit a New Add-on" with
 the same id fails with **Duplicate add-on ID found** - the add-on is already
 there. From then on the upload goes to the add-on's own page:
 
-> *Your add-ons* -> **Apple Passwords** -> *Submit a new version* -> the zip.
+> *Your add-ons* -> **iCloud Passwords** -> *Submit a new version* -> the zip.
 
 The version has to be higher than the one AMO has, so the manifest's version
 goes up with each release.
 
-If AMO gave the add-on an id of its own, the package has to carry that id -
-AMO wants the manifest's id to be the id of the add-on it is a version of:
-
-```bash
-./build-xpi.sh --id "the-id-from-the-amo-url"
-```
-
-The repository's manifest is not touched by that: the package is built in a
-staging copy.
+AMO wants the manifest's id to be the id of the add-on it is a version of, so
+the package is built with that id. The repository's manifest is not touched by
+that: the package is built in a staging copy.
 
 ### 3. The native host
 

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Apple Passwords",
+  "name": "iCloud Passwords",
   "version": "0.1.1",
   "description": "iCloud Keychain autofill for Linux - fill passwords and record new ones, via a native host.",
   "permissions": ["nativeMessaging", "activeTab"],
