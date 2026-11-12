@@ -243,7 +243,8 @@ async function main() {
     statusEl.textContent = "";
     const err = document.createElement("span");
     err.className = "err";
-    err.textContent = `Host unavailable: ${ping.error || "?"}`;
+    err.textContent = "The native host is not installed - see the README.";
+    err.title = ping.error || "";
     statusEl.appendChild(err);
     return;
   }
