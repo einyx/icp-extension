@@ -132,6 +132,28 @@ review. Listing it later only adds the store entry.
 AMO asks for a source-code URL and a license - use this repository and the MIT
 license in `LICENSE.md`.
 
+#### The first upload, and the ones after it
+
+The first upload *creates* the add-on, and the id in the manifest
+(`icp-linux@local`) becomes its id on AMO. A second "Submit a New Add-on" with
+the same id fails with **Duplicate add-on ID found** - the add-on is already
+there. From then on the upload goes to the add-on's own page:
+
+> *Your add-ons* -> **Apple Passwords** -> *Submit a new version* -> the zip.
+
+The version has to be higher than the one AMO has, so the manifest's version
+goes up with each release.
+
+If AMO gave the add-on an id of its own, the package has to carry that id -
+AMO wants the manifest's id to be the id of the add-on it is a version of:
+
+```bash
+./build-xpi.sh --id "the-id-from-the-amo-url"
+```
+
+The repository's manifest is not touched by that: the package is built in a
+staging copy.
+
 ### 3. The native host
 
 AMO gives the signed add-on its own gecko id. Register the native host with
