@@ -59,8 +59,8 @@ the keychain - the add-on never stores it.
 
 ### The source
 
-Everything is open: the add-on is MIT licensed, and the client it talks to is
-too.
+Everything is open: the add-on is GPLv3 licensed, and the client it talks to is
+open source too.
 
 - The add-on: https://github.com/einyx/icp-extension
 - The client: https://github.com/einyx/apple-passwords
@@ -77,7 +77,7 @@ too.
 | Tags | `password manager`, `autofill`, `two-factor authentication`, `privacy` |
 | Homepage URL | https://github.com/einyx/apple-passwords |
 | Source code URL | https://github.com/einyx/icp-extension |
-| License | MIT License (`LICENSE.md`) |
+| License | GNU General Public License v3.0 (`LICENSE.md`) |
 | Icon | `icons/icon.png` (128×128, in the package) |
 | Compatible with Firefox for Android | **No** |
 | Contains AI-generated content | No |
@@ -104,3 +104,21 @@ To test it:
    host is not installed" or an empty list, which is the expected behaviour
    without a keychain behind it.
 ```
+
+## The source code step
+
+addons.mozilla.org asks for the source of the add-on, and that anyone can
+rebuild the very same package from it. The answer is the repository itself:
+
+- **Source code URL**: https://github.com/einyx/icp-extension
+- **Build instructions**: the *Building from source* section of the
+  repository's README - the clone, `./build-xpi.sh`, and the check.
+- **Build script**: `build-xpi.sh` - it stages the extension's files and zips
+  them, which is the whole build. The add-on is plain JavaScript: no bundler,
+  no transpiler, nothing that rewrites the source.
+- **Operating system**: Linux (the script is a shell script; it runs the same
+  on macOS and on WSL).
+- **Programs used**: `zip` (Info-ZIP 3.0 or later) and `python3` (3.8 or
+  later) for the package; Node.js 18 or later only for the linter and for
+  signing, which are not part of the build.
+- **Licence**: GPLv3, in `LICENSE.md`.

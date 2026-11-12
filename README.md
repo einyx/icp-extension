@@ -12,7 +12,7 @@ client too.
 
 The client it talks to is [Apple Passwords](https://github.com/einyx/apple-passwords),
 the native iCloud Keychain app for Linux. This repository holds the extension
-on its own, so it can be installed, versioned and shared on its own. MIT
+on its own, so it can be installed, versioned and shared on its own. GPLv3
 licensed, like the project it comes from.
 
 ## How it works
@@ -93,10 +93,62 @@ shows:
 host/install.sh <EXTENSION_ID>
 ```
 
+## Building from source
+
+The add-on is plain JavaScript - there is no build step, no bundler, no
+transpiler. The files in the repository are the files that go into the
+package.
+
+### What it needs
+
+| | |
+| --- | --- |
+| Operating system | Linux (the build script is a shell script; it runs the same on macOS and on WSL) |
+| `zip` | Info-ZIP 3.0 or later - `apt install zip`, `dnf install zip`, `brew install zip` |
+| `python3` | 3.8 or later - only to read the manifest and to check the package |
+| Node.js | 18 or later - **only** for the linter and for signing with `web-ext`; the package itself does not need it |
+
+Node.js and npm come from <https://nodejs.org/> (or `nvm install 18`); the
+linter is run with `npx`, so nothing is installed into the repository.
+
+### The steps
+
+```bash
+git clone https://github.com/einyx/icp-extension.git
+cd icp-extension
+
+./build-xpi.sh            # -> dist/icloud-passwords-<version>.xpi and .zip
+python3 check-xpi.py dist/icloud-passwords-<version>.xpi
+```
+
+`build-xpi.sh` is the whole build: it stages the extension's own files
+(`manifest.json`, `background.js`, `content.js`, `popup.html`, `popup.js` and
+the two icons) and zips them. The `.xpi` and the `.zip` are the same package
+under two names - addons.mozilla.org's upload form asks for a zip.
+
+Nothing else is in the package: no README, no `host/`, no scripts. The native
+host is installed on the machine separately, because an add-on cannot ship one.
+
+To lint the package the way addons.mozilla.org does:
+
+```bash
+npx web-ext lint --source-dir .        # 0 errors, 3 warnings
+```
+
+To build it with the add-on id AMO gave it (AMO wants the manifest's id to be
+the id of the add-on the package is a version of):
+
+```bash
+./build-xpi.sh --id "icloud-passwords@einyx.github.io"
+```
+
+That builds in a staging copy, so the repository's `manifest.json` is not
+touched.
+
 ## Publish to addons.mozilla.org
 
 Yes - this extension can be published on AMO (the Firefox Marketplace). It is
-MIT licensed and its source is public, which is what AMO requires.
+GPLv3 licensed and its source is public, which is what AMO requires.
 
 ### 1. The package
 
@@ -129,8 +181,8 @@ New Add-on* -> *On your own* (unlisted). Unlisted is the right first step: the
 add-on gets signed and installable from its AMO URL without waiting for a
 review. Listing it later only adds the store entry.
 
-AMO asks for a source-code URL and a license - use this repository and the MIT
-license in `LICENSE.md`.
+AMO asks for a source-code URL and a license - use this repository and the GPL
+v3 in `LICENSE.md`.
 
 #### The first upload, and the ones after it
 
