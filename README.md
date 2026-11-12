@@ -1,9 +1,14 @@
 # Apple Passwords - browser extension for [icp](https://github.com/Sank6/iCloud-Keychain-for-Linux)
 
-A read-only iCloud Keychain autofill extension for Linux. It talks to the
-`icp` client through a native-messaging host and fills your logins into the
-page, the way the Passwords app does on a Mac or iPhone. Your one-time codes
-are generated on the spot, never read from a stored copy.
+An iCloud Keychain autofill extension for Linux. It talks to the `icp` client
+through a native-messaging host and fills your logins into the page, the way the
+Passwords app does on a Mac or iPhone. Your one-time codes are generated on the
+spot, never read from a stored copy.
+
+It also **writes**: a login you make on a site can be recorded in your real
+iCloud Keychain, and a password you change can be updated in place - so it
+reaches your other Apple devices. Strong password suggestions come from the
+client too.
 
 The canonical source of this extension is the `extension/` folder of the
 [icp](https://github.com/Sank6/iCloud-Keychain-for-Linux) repository; this
@@ -22,9 +27,18 @@ box, key held in the GNOME keyring). The native host answers three requests:
 
 | Request | Answer |
 | --- | --- |
-| `{"cmd":"ping"}` | `{"ok":true,"count":515}` - how many logins are stored |
+| `{"cmd":"ping"}` | `{"ok":true,"count":516}` - how many logins are stored |
 | `{"cmd":"match","domain":"..."}` | the logins for that domain, with a live one-time code |
 | `{"cmd":"totp","domain":"...","username":"..."}` | a freshly generated one-time code |
+| `{"cmd":"save","domain":...,"username":...,"password":...}` | records a new login in the keychain |
+| `{"cmd":"update","record":...,"password":...}` | changes a password already in the keychain |
+| `{"cmd":"delete","record":...}` | removes a login from the keychain |
+| `{"cmd":"generate","count":3}` | strong password suggestions |
+
+The password is read from the page **only** when the user presses the button in
+the popup, and it goes straight to the keychain - the extension never stores
+it. A login that is already in the keychain is updated rather than added twice,
+and the site is the tab's own host, never one the page claims.
 
 A credential's one-time-code secret never crosses this protocol: `match`
 carries the code generated at request time, and `totp` re-generates it when

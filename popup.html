@@ -35,6 +35,48 @@
       color: var(--muted); font-size: 12px;
     }
 
+    #save {
+      border-top: 1px solid var(--line);
+      padding: 10px 12px 12px;
+    }
+    #save button {
+      width: 100%; padding: 7px 10px; font: inherit; font-size: 12px;
+      color: var(--accent); background: var(--hover);
+      border: 1px solid var(--line); border-radius: 7px; cursor: pointer;
+    }
+    #save button:hover:not(:disabled) { background: #eaf3ff; }
+    #save button:disabled { color: var(--muted); cursor: default; }
+    #save .msg { margin-top: 7px; font-size: 11px; color: var(--muted); }
+    #save .msg.err { color: #d70015; }
+    #save .msg.ok { color: #1a7f37; }
+    #save .who {
+      margin-top: 7px; padding: 7px 9px; border-radius: 7px;
+      background: var(--hover); border: 1px solid var(--line); font-size: 12px;
+    }
+    #save .who .u { font-weight: 500; }
+    #save .who .d { color: var(--muted); font-size: 11px; }
+    #save .row { display: flex; gap: 6px; margin-top: 7px; }
+    #save #genBtn { margin-top: 6px; }
+    .suggestions { margin-top: 8px; }
+    .suggestion {
+      display: flex; align-items: center; gap: 6px; margin-top: 5px;
+    }
+    .suggestion span {
+      flex: 1; font-family: monospace; font-size: 12px;
+      word-break: break-all;
+    }
+    .suggestion button {
+      flex: none; font-size: 11px; padding: 3px 8px; border-radius: 6px;
+      border: 1px solid var(--line); background: #fff; color: var(--accent);
+      cursor: pointer;
+    }
+    .suggestion button:hover { background: var(--hover); }
+    #save .row button { flex: 1; }
+    #save .row button.primary {
+      color: #fff; background: var(--accent); border-color: var(--accent);
+    }
+    #save .row button.primary:hover:not(:disabled) { background: #0062bd; }
+
     .cred {
       display: flex; align-items: center; gap: 10px;
       padding: 9px 10px; border-radius: 8px; cursor: pointer;
@@ -66,6 +108,11 @@
   </header>
   <div id="status">Connecting...</div>
   <div id="list"></div>
+  <div id="save">
+    <button id="saveBtn">Save this login to iCloud Keychain</button>
+    <button id="genBtn">Suggest a strong password</button>
+    <div id="saveMsg" class="msg"></div>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

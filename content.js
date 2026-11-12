@@ -415,11 +415,32 @@
     removeMenu();
   });
 
+  // The credentials the page currently holds, for the popup's "save this login" button.
+  // Only the extension asks for this, and only when the user clicks the button - a page
+  // cannot make us hand anything over, and nothing is read until it is asked for.
+  function formCredentials() {
+    const pw = passwordField(null);
+    if (!pw || !pw.value) return null;
+    const userField = findUsernameField(pw);
+    const username = userField ? (userField.value || "") : "";
+    if (!username) return null;
+    return { domain: location.hostname, username: username, password: pw.value };
+  }
+
   chrome.runtime.onMessage.addListener((msg, _sender, respond) => {
     if (msg && msg.cmd === "fill") {
       removeMenu();
       fill(msg.credential, null);
       respond({ ok: true });
+    }
+    if (msg && msg.cmd === "getFormCredentials") {
+      let creds = null;
+      try {
+        creds = formCredentials();
+      } catch (_) {
+        creds = null;
+      }
+      respond(creds ? { ok: true, ...creds } : { ok: false, error: "no login form found" });
     }
     return false;
   });
