@@ -140,7 +140,12 @@ that id, so the host only talks to the add-on you installed:
 host/install.sh "" "<AMO_ADDON_ID>"
 ```
 
-The add-on id is in its AMO URL: `something@your-domain`.
+The add-on id is in its AMO URL: `something@your-domain`. Several ids can be
+given, separated by commas, so the sideloaded copy keeps working as well:
+
+```bash
+host/install.sh "" "icp-linux@local,<AMO_ADDON_ID>"
+```
 
 ### 4. Installing it
 

@@ -9,7 +9,8 @@
 # FIREFOX_ADDON_ID is the gecko id of the Firefox add-on. It defaults to the one in
 # extension/manifest.json, which is what a sideloaded copy has. A build signed by
 # addons.mozilla.org gets its own id instead, so pass that one when you install from
-# AMO (it is in the add-on's URL: <id>@<domain>).
+# AMO (it is in the add-on's URL: <id>@<domain>). Several ids can be given, separated
+# by commas, so a sideloaded copy and the signed add-on can both reach the host.
 #
 # Writes the host manifest into each browser's NativeMessagingHosts dir, pointing at the
 # launcher in this repo. Re-run after moving the repo.
@@ -62,9 +63,22 @@ else
 fi
 
 # --- Firefox (keyed by the add-on's gecko id, so no per-install id needed for a sideloaded copy) ---
-FIREFOX_MANIFEST="$(sed -e "s#__HOST_LAUNCHER__#$LAUNCHER#" \
-                        -e "s#__GECKO_ID__#$GECKO_ID#" \
-                        "$REPO/host/org.icp.native.firefox.json.template")"
+# Every id the host answers, comma separated.
+FIREFOX_MANIFEST="$(python3 - "$LAUNCHER" "$GECKO_ID" <<'JSON'
+import json
+import sys
+
+launcher, ids = sys.argv[1], sys.argv[2]
+wanted = [i.strip() for i in ids.split(",") if i.strip()]
+print(json.dumps({
+    "name": "org.icp.native",
+    "description": "Apple Passwords native messaging host",
+    "path": launcher,
+    "type": "stdio",
+    "allowed_extensions": wanted,
+}, indent=2))
+JSON
+)"
 if command -v firefox >/dev/null 2>&1 || [ -d "$HOME/.mozilla" ]; then
   write_manifest "$FIREFOX_MANIFEST" "$HOME/.mozilla/native-messaging-hosts"
 fi
