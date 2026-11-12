@@ -31,6 +31,7 @@ rm -f "$XPI"
 # The extension's own files, and nothing else: no README, no host/, no repository.
 cd "$EXT_DIR"
 zip -q -X "$XPI" manifest.json background.js content.js popup.html popup.js
+zip -q -X "$XPI" icons/icon-48.png icons/icon.png
 
 echo "built $XPI"
 unzip -l "$XPI" | sed 's/^/  /'

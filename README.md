@@ -1,4 +1,4 @@
-# Apple Passwords - browser extension for [icp](https://github.com/Sank6/iCloud-Keychain-for-Linux)
+# Apple Passwords - the browser extension for [Apple Passwords](https://github.com/einyx/apple-passwords)
 
 An iCloud Keychain autofill extension for Linux. It talks to the `icp` client
 through a native-messaging host and fills your logins into the page, the way the
@@ -10,10 +10,10 @@ iCloud Keychain, and a password you change can be updated in place - so it
 reaches your other Apple devices. Strong password suggestions come from the
 client too.
 
-The canonical source of this extension is the `extension/` folder of the
-[icp](https://github.com/Sank6/iCloud-Keychain-for-Linux) repository; this
-repository is a standalone copy so it can be installed, versioned and shared
-on its own. MIT licensed, like the project it comes from.
+The client it talks to is [Apple Passwords](https://github.com/einyx/apple-passwords),
+the native iCloud Keychain app for Linux. This repository holds the extension
+on its own, so it can be installed, versioned and shared on its own. MIT
+licensed, like the project it comes from.
 
 ## How it works
 
@@ -23,7 +23,7 @@ browser page  <-- content script -->  extension  <-- native messaging -->  icp
 ```
 
 `icp` decrypts your keychain into `~/.config/icp/vault.enc` (libsodium secret
-box, key held in the GNOME keyring). The native host answers three requests:
+box, key held in the GNOME keyring). The native host answers these requests:
 
 | Request | Answer |
 | --- | --- |
@@ -98,37 +98,58 @@ host/install.sh <EXTENSION_ID>
 Yes - this extension can be published on AMO (the Firefox Marketplace). It is
 MIT licensed and its source is public, which is what AMO requires.
 
-1. Build the package:
+### 1. The package
 
-   ```bash
-   ./build-xpi.sh          # -> dist/apple-passwords-<version>.xpi
-   ```
+```bash
+./build-xpi.sh          # -> dist/apple-passwords-<version>.xpi
+python3 check-xpi.py dist/apple-passwords-<version>.xpi
+```
 
-2. Sign it on AMO: <https://addons.mozilla.org/developers/> -> *Submit a New
-   Add-on* -> *On your own* (unlisted). Unlisted is the right first step: the
-   add-on gets signed and installable from its AMO URL without waiting for a
-   review. Listing it later only adds the store entry.
+The XPI is the extension's own files and nothing else: an add-on cannot ship a
+native host, so the host is installed on the machine separately with
+`host/install.sh`.
 
-   AMO asks for a source-code URL and a license - use this repository and the
-   MIT license in `LICENSE.md`.
+### 2. The signature
 
-3. AMO gives the signed add-on its own gecko id. Register the native host with
-   that id, so the host only talks to the add-on you installed:
+AMO signs the package. The quickest way is `web-ext`, which uploads it and
+brings the signed add-on back:
 
-   ```bash
-   host/install.sh "" "<AMO_ADDON_ID>"
-   ```
+```bash
+export AMO_API_KEY=...      AMO_API_SECRET=...    # Developer Settings -> API keys
+export AMO_USER=...        AMO_PASSWORD=...
+./sign.sh                  # -> dist/apple-passwords-<version>.signed.xpi
+```
 
-   The add-on id is in its AMO URL: `something@your-domain`.
+`sign.sh` lints the package with the same linter AMO uses first, so a
+submission that would bounce does not.
 
-4. Install it in Firefox from the AMO URL (`about:addons` -> gear ->
-   *Install Add-on From URL*). A signed add-on needs neither
-   `xpinstall.signatures.required` nor `extensions.autoDisableScopes`, and it
-   updates itself.
+Or, without an API key: <https://addons.mozilla.org/developers/> -> *Submit a
+New Add-on* -> *On your own* (unlisted). Unlisted is the right first step: the
+add-on gets signed and installable from its AMO URL without waiting for a
+review. Listing it later only adds the store entry.
+
+AMO asks for a source-code URL and a license - use this repository and the MIT
+license in `LICENSE.md`.
+
+### 3. The native host
+
+AMO gives the signed add-on its own gecko id. Register the native host with
+that id, so the host only talks to the add-on you installed:
+
+```bash
+host/install.sh "" "<AMO_ADDON_ID>"
+```
+
+The add-on id is in its AMO URL: `something@your-domain`.
+
+### 4. Installing it
+
+In Firefox: `about:addons` -> gear -> *Install Add-on From URL*, and paste the
+AMO URL. A signed add-on needs neither `xpinstall.signatures.required` nor
+`extensions.autoDisableScopes`, and it updates itself.
 
 ## Security notes
 
-* The extension is read-only: it never writes to the keychain.
 * A credential's one-time-code secret never crosses the native-messaging
   protocol - only a code generated at that moment does.
 * The native host answers a `match` request only for the domain of the page
@@ -144,9 +165,8 @@ MIT licensed and its source is public, which is what AMO requires.
 ## Requirements
 
 * `icp` installed and signed in (`icp login`), so that the local vault exists
-* the `icp` Python package importable by the host - the launcher picks the
-  repository's virtualenv, then the one behind an installed `icp` entry point,
-  then `python3` on `PATH`
+* the `icp-host` binary - the launcher looks for it in `~/.local/bin`, then in
+  a checkout of the app's repository
 
 ## Notes
 
@@ -154,4 +174,6 @@ MIT licensed and its source is public, which is what AMO requires.
   `DBUS_SESSION_BUS_ADDRESS` on. The launcher points at the session bus
   itself, because the vault's master key lives in the GNOME keyring and is
   otherwise unreachable - which would show an empty password list.
-* The extension is read-only. It never writes to the keychain.
+* The extension writes to the keychain only when the user asks it to: the
+  button in the popup records a login, or changes the password of one that is
+  already there.

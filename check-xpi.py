@@ -47,6 +47,10 @@ if background.get("service_worker"):
     referenced.add(background["service_worker"])
 if manifest.get("action", {}).get("default_popup"):
     referenced.add(manifest["action"]["default_popup"])
+for icon in manifest.get("icons", {}).values():
+    referenced.add(icon)
+for icon in manifest.get("action", {}).get("default_icon", {}).values():
+    referenced.add(icon)
 for missing in sorted(referenced - names):
     problems.append(f"{missing} is referenced by the manifest but not in the package")
 
