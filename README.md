@@ -101,13 +101,14 @@ MIT licensed and its source is public, which is what AMO requires.
 ### 1. The package
 
 ```bash
-./build-xpi.sh          # -> dist/apple-passwords-<version>.xpi
+./build-xpi.sh          # -> dist/apple-passwords-<version>.xpi and .zip
 python3 check-xpi.py dist/apple-passwords-<version>.xpi
 ```
 
 The XPI is the extension's own files and nothing else: an add-on cannot ship a
 native host, so the host is installed on the machine separately with
-`host/install.sh`.
+`host/install.sh`. The `.zip` is the same package under the name addons.mozilla.org's
+upload form asks for - the two files are identical.
 
 ### 2. The signature
 

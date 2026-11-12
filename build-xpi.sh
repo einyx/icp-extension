@@ -33,5 +33,10 @@ cd "$EXT_DIR"
 zip -q -X "$XPI" manifest.json background.js content.js popup.html popup.js
 zip -q -X "$XPI" icons/icon-48.png icons/icon.png
 
+# The same package under a .zip name: addons.mozilla.org's upload form asks for
+# a zip, and the two are the same file.
+cp "$XPI" "${XPI%.xpi}.zip"
+
 echo "built $XPI"
+echo "built ${XPI%.xpi}.zip"
 unzip -l "$XPI" | sed 's/^/  /'
